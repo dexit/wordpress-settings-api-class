@@ -1,16 +1,11 @@
 <?php
 
+namespace Idearia;
+
 /**
- * weDevs Settings API wrapper class
- *
- * @version 1.3 (27-Sep-2016)
- *
- * @author Tareq Hasan <tareq@weDevs.com>
- * @link https://tareq.co Tareq Hasan
- * @example example/oop-example.php How to use the class
+ * Settings API wrapper class
  */
-if ( !class_exists( 'WeDevs_Settings_API' ) ):
-class WeDevs_Settings_API {
+class SettingsApi {
 
     /**
      * settings sections array
@@ -668,5 +663,3 @@ class WeDevs_Settings_API {
     }
 
 }
-
-endif;
