@@ -1,5 +1,5 @@
 # Come funziona
-Estendi la classa `Idearia\SettingsPage` per creare nuovi menu o sottomenu in WordPress.
+Crea nuovi menu o sottomenu in WordPress estendendo la classe `Idearia\SettingsPage`.
 
 # Per avere più controllo
 
