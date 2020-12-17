@@ -5,13 +5,6 @@
     "type": "library",
     "license": "GPL-3.0-or-later",
     "homepage": "https://github.com/Idearia/wordpress-settings-api-class",
-    "authors": [
-        {
-            "name": "Idearia Web Agency",
-            "email": "dev@idearia.it",
-            "homepage": "https://www.idearia.it"
-        }
-    ],
     "require": {
         "php": "^7.0"
     },
