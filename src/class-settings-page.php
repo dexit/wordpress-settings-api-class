@@ -27,8 +27,9 @@ defined( 'ABSPATH' ) || exit;
  *   verrà creato un menu madre ad hoc con etichetta $label
  * - $menuLabel => per specificare un'etichetta del menu
  *   diversa da $label
- * - $capabilities => per specificare quali capabilities deve 
+ * - $capability => per specificare quale capability deve 
  *   possedere l'utente per visualizzare la voce del menu
+ *   e modificarne i settings (default = manage_options)
  * - view() => funzione che stampa l'HTML; lascia vuoto se
  *   verrà usato un semplice layout dove ogni sezione è un tab.
  *
@@ -69,10 +70,12 @@ abstract class SettingsPage {
 	 * Ignorata se viene specificato un valore per $parentSlug.
 	 */
 	protected $menuLabel = '';
+
 	/**
 	 * Permessi per visualizzare la voce del menu
 	 */
-	protected $capabilities = 'manage_options';
+	protected $capability = 'manage_options';
+
 	/**
 	 * Priorità della voce di menu nel filtro WordPress admin_menu
 	 */
@@ -85,10 +88,45 @@ abstract class SettingsPage {
 	 */
 	private $api;
 
+	/**
+	 * Metodo da sovrascrivere che ritorna l'array delle sezioni
+	 * da passare a class-settings-api.php
+	 */
+	abstract protected function getSections();
+
+	/**
+	 * Metodo da sovrascrivere che ritorna l'array dei setting
+	 * fields da passare a class-settings-api.php
+	 */
+	abstract protected function getFields();
+
+	/**
+	 * Registra gli hooks
+	 */
 	public function __construct() {
 		$this->api = new SettingsApi;
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), $this->filterPriority );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		if ( $this->capability !== 'manage_options' ) {
+			$this->set_write_capabilities();
+		}
+	}
+
+	/**
+	 * Permetti agli utenti con la capability richiesta
+	 * di modificare i settings
+	 */
+	private function set_write_capabilities() {
+		$sections = $this->getSections();
+		$sections_ids = array_column( $sections, 'id' );
+		foreach ( $sections_ids as $option_page ) {
+			add_filter(
+				'option_page_capability_' . $option_page,
+				function( $cap ) {
+					return $this->capability;
+				}
+			);
+		}
 	}
 
 	/**
@@ -106,20 +144,20 @@ abstract class SettingsPage {
 	public function admin_menu() {
 		// Se la pagina è una sottovoce di un menu madre esistente...
 		if ( ! empty( $this->parentSlug ) ) {
-			add_submenu_page( $this->parentSlug, $this->label, $this->label, $this->capabilities, $this->slug, [ $this, 'view' ], $this->position );
+			add_submenu_page( $this->parentSlug, $this->label, $this->label, $this->capability, $this->slug, [ $this, 'view' ], $this->position );
 		}
 		// Se il menu madre va creato...
 		else {
 			// Caso in cui l'etichetta del menu madre è diversa da quella
 			// della sottovoce di menu (https://wordpress.stackexchange.com/a/66499/86662)
 			if ( ! empty( $this->menuLabel ) ) {
-				add_menu_page( $this->menuLabel, $this->menuLabel, $this->capabilities, $this->slug, '__return_true', '', $this->position );
-				add_submenu_page( $this->slug, $this->label, $this->label, $this->capabilities, $this->slug, [ $this, 'view' ] );
+				add_menu_page( $this->menuLabel, $this->menuLabel, $this->capability, $this->slug, '__return_true', '', $this->position );
+				add_submenu_page( $this->slug, $this->label, $this->label, $this->capability, $this->slug, [ $this, 'view' ] );
 			}
 			// Caso in cui non ci interessa differenziare, ad es. perché non ci sono
 			// altre pagine di menu nel menu madre
 			else {
-				add_menu_page( $this->label, $this->label, $this->capabilities, $this->slug, [ $this, 'view' ], '', $this->position );
+				add_menu_page( $this->label, $this->label, $this->capability, $this->slug, [ $this, 'view' ], '', $this->position );
 			}
 		}
 	}
