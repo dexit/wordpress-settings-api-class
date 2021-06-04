@@ -14,6 +14,9 @@ defined( 'ABSPATH' ) || exit;
  * per accedere alle opzioni, invece di dover fare
  *   $sezione_x = get_option('sezione_x)
  *   $opzione_y = $sezione_x['opzione_y]
+ *
+ * Estendi la classe per definire dei valori di default
+ * e per definire un prefisso a database.
  */
 abstract class config
 {
@@ -78,14 +81,14 @@ abstract class config
             throw new Exception( 'Passato valore vuoto o invalido a config', 1 );
         }
 
-        $default = $default ?? self::getDefaultValue( $query );
+        $default = $default ?? static::getDefaultValue( $query );
 
         $option_key = $option_name;
 
-        if ( self::$db_prefix ) {
-            $option_key = self::$db_prefix . $option_key;
+        if ( static::$db_prefix ) {
+            $option_key = static::$db_prefix . $option_key;
         }
-        
+
         $option_value = get_option( $option_key, $default );
 
         if ( count( $tokens ) === 1 ) {
@@ -101,7 +104,7 @@ abstract class config
      */
     public static function getDefaultValue( string $query )
     {
-        $defaults = self::getDefaults();
+        $defaults = static::getDefaults();
         
         return $defaults[ $query ] ?? null;
     }
