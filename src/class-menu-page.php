@@ -3,8 +3,6 @@
 
 namespace Idearia;
 
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Crea una pagina generica di menu in WordPress e mostrala come
  * voce di menu a se stante oppure come sottovoce di un menu
@@ -79,6 +77,12 @@ abstract class MenuPage
 	 * Registra gli hooks
 	 */
 	public function __construct() {
+		if ( ! $this->label ) {
+			throw new \Exception( 'Label non definita!' );
+		}
+		if ( ! $this->slug ) {
+			throw new \Exception( 'Slug non definita!' );
+		}
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), $this->filterPriority );
 	}
 
@@ -107,9 +111,8 @@ abstract class MenuPage
 	}
 
 	/**
-	 * Funzione usata per renderizzare l'HTML
+	 * Funzione usata per renderizzare l'HTML; deve fare
+	 * echo di qualcosa.
 	 */
-	public function view() {
-		return 'Hello world!';
-	}
+	abstract public function view();
 }

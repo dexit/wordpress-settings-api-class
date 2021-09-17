@@ -1,7 +1,7 @@
 {
     "name": "idearia/wordpress-settings-api-class",
     "description": "WordPress settings API Abstraction Class",
-    "keywords": ["wp","wordpress", "settings-api"],
+    "keywords": ["wp", "wordpress", "settings-api"],
     "type": "library",
     "license": "GPL-3.0-or-later",
     "homepage": "https://github.com/Idearia/wordpress-settings-api-class",
