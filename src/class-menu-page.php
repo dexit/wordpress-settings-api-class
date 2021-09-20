@@ -27,7 +27,7 @@ namespace Idearia;
  *
  * Ricordati di caricare la classe nel bootstrap del tuo plugin.
  */
-abstract class MenuPage
+class MenuPage
 {
 	/**
 	 * Nome della pagina, apparirà sia come titolo della pagina che
@@ -50,7 +50,7 @@ abstract class MenuPage
 	 * options-general.php).
 	 *
 	 * Se lasci vuoto, verrà creato appositamente un nuovo menu
-	 * madre con slug $parentSlug e con etichetta $label.
+	 * madre con slug $slug e con etichetta $label.
 	 */
 	protected $parentSlug = '';
 
@@ -59,7 +59,8 @@ abstract class MenuPage
 	 * con $label, oppure se il menu non ha altre pagine oltre
 	 * questa.
 	 *
-	 * Ignorata se viene specificato un valore per $parentSlug.
+	 * Ignorata se viene specificato un valore per $parentSlug,
+	 * perché in quel caso la label è quella del parent.
 	 */
 	protected $menuLabel = '';
 
@@ -76,20 +77,34 @@ abstract class MenuPage
 	/**
 	 * Registra gli hooks
 	 */
-	public function __construct() {
+	public function __construct( array $attributes = [] )
+	{
+		// Parse arguments
+		$this->label = $attributes['label'] ?? $this->label;
+		$this->slug = $attributes['slug'] ?? $this->slug;
+		$this->position = $attributes['position'] ?? $this->position;
+		$this->parentSlug = $attributes['parentSlug'] ?? $this->parentSlug;
+		$this->menuLabel = $attributes['menuLabel'] ?? $this->menuLabel;
+		$this->capability = $attributes['capability'] ?? $this->capability;
+		$this->filterPriority = $attributes['filterPriority'] ?? $this->filterPriority;
+
+		// Validate
 		if ( ! $this->label ) {
 			throw new \Exception( 'Label non definita!' );
 		}
 		if ( ! $this->slug ) {
 			throw new \Exception( 'Slug non definita!' );
 		}
+
+		// Crea pagina di menu
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), $this->filterPriority );
 	}
 
 	/**
 	 * Aggiungi alla sidebar la voce di menu
 	 */
-	public function admin_menu() {
+	public function admin_menu()
+	{
 		// Se la pagina è una sottovoce di un menu madre esistente...
 		if ( ! empty( $this->parentSlug ) ) {
 			add_submenu_page( $this->parentSlug, $this->label, $this->label, $this->capability, $this->slug, [ $this, 'view' ], $this->position );
@@ -114,5 +129,11 @@ abstract class MenuPage
 	 * Funzione usata per renderizzare l'HTML; deve fare
 	 * echo di qualcosa.
 	 */
-	abstract public function view();
+	public function view()
+	{
+        echo '<h1>Hello world</h1>';
+        echo '<p>';
+        echo 'Questa pagina può essere vista solo da chi ha la capability ' . $this->capability;
+        echo '</p>';
+	}
 }
