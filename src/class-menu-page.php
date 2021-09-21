@@ -41,13 +41,20 @@ class MenuPage
 	protected $slug; // obbligatorio
 
 	/**
+	 * Funzione usata per renderizzare l'HTML; deve fare
+	 * echo di qualcosa.
+	 */
+	protected $viewCallback;
+
+	/**
 	 * Posizione della voce di menu nella sidebar
 	 */
 	protected $position = null;
 
 	/**
 	 * Menu madre a cui far appartenere questa pagina (ad es.
-	 * options-general.php).
+	 * options-general.php per farlo apparire nei 'Settings' di
+	 * WordPress).
 	 *
 	 * Se lasci vuoto, verrà creato appositamente un nuovo menu
 	 * madre con slug $slug e con etichetta $label.
@@ -82,6 +89,12 @@ class MenuPage
 		// Parse arguments
 		$this->label = $attributes['label'] ?? $this->label;
 		$this->slug = $attributes['slug'] ?? $this->slug;
+		$this->viewCallback = $attributes['view'] ?? function() {
+			echo '<h1>Hello world!</h1>';
+			echo '<p>';
+			echo 'Questa pagina può essere vista solo da chi ha una certa capability';
+			echo '</p>';	
+		};
 		$this->position = $attributes['position'] ?? $this->position;
 		$this->parentSlug = $attributes['parentSlug'] ?? $this->parentSlug;
 		$this->menuLabel = $attributes['menuLabel'] ?? $this->menuLabel;
@@ -126,14 +139,25 @@ class MenuPage
 	}
 
 	/**
-	 * Funzione usata per renderizzare l'HTML; deve fare
-	 * echo di qualcosa.
+	 * Funzione usata per renderizzare l'HTML
 	 */
 	public function view()
 	{
-        echo '<h1>Hello world</h1>';
-        echo '<p>';
-        echo 'Questa pagina può essere vista solo da chi ha la capability ' . $this->capability;
-        echo '</p>';
+		call_user_func_array( $this->viewCallback, [] );
+	}
+
+	/**
+	 * Ritorna true se le dipendenze necessarie per mostrare la voce
+	 * di menu sono a posto
+	 */
+	public function checkDependencies()
+	{
+		foreach( $this->requiredPlugins as $plugin )
+		{
+			if ( ! is_plugin_active( $plugin ) ) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
