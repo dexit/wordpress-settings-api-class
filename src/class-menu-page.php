@@ -82,6 +82,13 @@ class MenuPage
 	protected $filterPriority = 10;
 
 	/**
+	 * Specifica qui i plugin che devono essere presenti affinché
+	 * la voce di menu venga mostrata; usa lo stesso formato
+	 * richiesto da is_plugin_active()
+	 */
+	protected $requiredPlugins = [];
+
+	/**
 	 * Registra gli hooks
 	 */
 	public function __construct( array $attributes = [] )
@@ -100,6 +107,7 @@ class MenuPage
 		$this->menuLabel = $attributes['menuLabel'] ?? $this->menuLabel;
 		$this->capability = $attributes['capability'] ?? $this->capability;
 		$this->filterPriority = $attributes['filterPriority'] ?? $this->filterPriority;
+		$this->requiredPlugins = $attributes['requiredPlugins'] ?? $this->requiredPlugins;
 
 		// Validate
 		if ( ! $this->label ) {
@@ -118,6 +126,11 @@ class MenuPage
 	 */
 	public function admin_menu()
 	{
+		// Se non sono attivi i plugin richiesti, non mostrare nulla
+		if ( ! $this->checkDependencies() ) {
+			return;
+		}
+
 		// Se la pagina è una sottovoce di un menu madre esistente...
 		if ( ! empty( $this->parentSlug ) ) {
 			add_submenu_page( $this->parentSlug, $this->label, $this->label, $this->capability, $this->slug, [ $this, 'view' ], $this->position );
