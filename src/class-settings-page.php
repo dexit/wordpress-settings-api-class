@@ -42,7 +42,7 @@ abstract class SettingsPage extends MenuPage
 	 * Settings API di WordPress; verrà impostato nel
 	 * constructor automaticamente
 	 */
-	private $api;
+	public $api;
 
 	/**
 	 * Metodo da sovrascrivere che ritorna l'array delle sezioni
@@ -89,13 +89,12 @@ abstract class SettingsPage extends MenuPage
 	 * Callback che registra tutti i nostri settings usando l'API
 	 */
 	public function admin_init() {
-		// Se non siamo sulla pagina dei settings, non
-		// serve calcolare le sezioni e i campi
-		if ( ( $_GET[ 'page' ] ?? '' ) !== $this->slug ) {
-			return;
-		}
 		$this->api->set_sections( $this->getSections() );
-		$this->api->set_fields( $this->getFields() );
+		// Se non siamo sulla pagina specifica della sezione,
+		// non serve calcolare tutti i campi
+		if ( ( $_GET[ 'page' ] ?? '' ) === $this->slug ) {
+			$this->api->set_fields( $this->getFields() );
+		}
 		$this->api->admin_init();
 	}
 
