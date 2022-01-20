@@ -15,8 +15,12 @@ defined( 'ABSPATH' ) || exit;
  *   $sezione_x = get_option('sezione_x)
  *   $opzione_y = $sezione_x['opzione_y]
  *
- * Estendi la classe per definire dei valori di default
- * e per definire un prefisso a database.
+ * Estendi la classe per:
+ * - Definire dei valori di default, tramite l'override di getDefaults()
+ * - Definire un prefisso per la option_name nella tabella wp_options,
+ *   tramite l'override di $db_prefix.
+ * - Effettuare una validazione o sanitizzazione delle opzioni, tramite
+ *   l'override di config()
  */
 abstract class config
 {
