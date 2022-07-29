@@ -24,6 +24,8 @@ namespace Idearia;
  *   diversa da $label
  * - $capability => per specificare quale capability deve 
  *   possedere l'utente per visualizzare la voce del menu
+ * - $icon => icona del menu, di default l'ingranaggio; i valori
+ *   accettati sono gli stessi di $icon_url
  *
  * Ricordati di caricare la classe nel bootstrap del tuo plugin.
  */
@@ -77,9 +79,26 @@ class MenuPage
 	protected $capability = 'manage_options';
 
 	/**
-	 * Priorità della voce di menu nel filtro WordPress admin_menu
+	 * Priorità della voce di menu nel filtro WordPress admin_menu.
+	 *
+	 * IMPORTANTE: Per i sottomenu, va impostato un valore superiore a
+	 * quello del menu parent, altrimenti il sottomenu darà un 404.
 	 */
 	protected $filterPriority = 10;
+
+	/**
+	 * Icona da usare per la voce di menu; va usato solo per i menu parent,
+	 * di default è l'icona dell'ingranaggio.
+	 *
+	 * Puoi passare una URL oppure uno di questi tre:
+	 * - Pass a base64-encoded SVG using a data URI, which will be colored to
+	 *   match the color scheme. This should begin with 'data:image/svg+xml;base64,'.
+	 * - Pass the name of a Dashicons helper class to use a font icon,
+	 *   e.g. 'dashicons-chart-pie'.
+	 * - Pass 'none' to leave div.wp-menu-image empty so an icon can be
+	 *   added via CSS.
+	 */
+	protected $icon = '';
 
 	/**
 	 * Specifica qui i plugin che devono essere presenti affinché
@@ -106,6 +125,7 @@ class MenuPage
 		$this->parentSlug = $attributes['parentSlug'] ?? $this->parentSlug;
 		$this->menuLabel = $attributes['menuLabel'] ?? $this->menuLabel;
 		$this->capability = $attributes['capability'] ?? $this->capability;
+		$this->icon = $attributes['icon'] ?? $this->icon;
 		$this->filterPriority = $attributes['filterPriority'] ?? $this->filterPriority;
 		$this->requiredPlugins = $attributes['requiredPlugins'] ?? $this->requiredPlugins;
 
@@ -140,13 +160,13 @@ class MenuPage
 			// Caso in cui l'etichetta del menu madre è diversa da quella
 			// della sottovoce di menu (https://wordpress.stackexchange.com/a/66499/86662)
 			if ( ! empty( $this->menuLabel ) ) {
-				add_menu_page( $this->menuLabel, $this->menuLabel, $this->capability, $this->slug, '__return_true', '', $this->position );
+				add_menu_page( $this->menuLabel, $this->menuLabel, $this->capability, $this->slug, '__return_true', $this->icon, $this->position );
 				add_submenu_page( $this->slug, $this->label, $this->label, $this->capability, $this->slug, [ $this, 'view' ] );
 			}
 			// Caso in cui non ci interessa differenziare, ad es. perché non ci sono
 			// altre pagine di menu nel menu madre
 			else {
-				add_menu_page( $this->label, $this->label, $this->capability, $this->slug, [ $this, 'view' ], '', $this->position );
+				add_menu_page( $this->label, $this->label, $this->capability, $this->slug, [ $this, 'view' ], $this->icon, $this->position );
 			}
 		}
 	}
