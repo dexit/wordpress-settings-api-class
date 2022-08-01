@@ -58,7 +58,7 @@ class ExampleSettingsPage extends SettingsPage
 
     protected $slug = 'example-settings-page';
 
-    public function getSections()
+    protected function getSections()
     {
         return array(
             array(
@@ -72,7 +72,7 @@ class ExampleSettingsPage extends SettingsPage
         );
     }
 
-    public function getFields()
+    protected function getFields()
     {
         return array(
             'wedevs_basics' => array(

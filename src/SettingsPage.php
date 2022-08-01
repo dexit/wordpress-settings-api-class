@@ -74,6 +74,7 @@ abstract class SettingsPage extends MenuPage
 	 */
 	private function set_write_capabilities() {
 		$sections = $this->getSections();
+		$sections = apply_filters( 'idearia_settings_api_filter_sections', $sections, $this->slug, $this );
 		$sections_ids = array_column( $sections, 'id' );
 		foreach ( $sections_ids as $option_page ) {
 			add_filter(
@@ -89,11 +90,15 @@ abstract class SettingsPage extends MenuPage
 	 * Callback che registra tutti i nostri settings usando l'API
 	 */
 	public function admin_init() {
-		$this->api->set_sections( $this->getSections() );
-		// Se non siamo sulla pagina specifica della sezione,
+		$sections = $this->getSections();
+		$sections = apply_filters( 'idearia_settings_api_filter_sections', $sections, $this->slug, $this );
+		$this->api->set_sections( $sections );
+		// Se non siamo sulla pagina specifica della sezione,
 		// non serve calcolare tutti i campi
 		if ( ( $_GET[ 'page' ] ?? '' ) === $this->slug ) {
-			$this->api->set_fields( $this->getFields() );
+			$fields = $this->getFields();
+			$fields = apply_filters( 'idearia_settings_api_filter_fields', $fields, $this->slug, $this );
+			$this->api->set_fields( $fields );
 		}
 		$this->api->admin_init();
 	}
