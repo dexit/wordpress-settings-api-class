@@ -5,8 +5,8 @@ namespace Idearia;
 /**
  * Settings API wrapper class
  */
-class SettingsApi {
-
+class SettingsApi
+{
     /**
      * settings sections array
      *
