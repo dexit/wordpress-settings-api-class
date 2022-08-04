@@ -22,7 +22,7 @@ defined( 'ABSPATH' ) || exit;
  * - Effettuare una validazione o sanitizzazione delle opzioni, tramite
  *   l'override di config()
  */
-abstract class config
+abstract class Config
 {
     /**
      * Opzionalmente, specifica i valori di default da 
