@@ -82,7 +82,7 @@ abstract class Config
         $option_name = $tokens[0];
 
         if ( ! $option_name ) {
-            throw new Exception( 'Passato valore vuoto o invalido a config', 1 );
+            throw new \Exception( 'Passato valore vuoto o invalido a config', 1 );
         }
 
         $default = $default ?? static::getDefaultValue( $query );
