@@ -17,8 +17,8 @@ defined( 'ABSPATH' ) || exit;
  *
  * Estendi la classe per:
  * - Definire dei valori di default, tramite l'override di getDefaults()
- * - Definire un prefisso per la option_name nella tabella wp_options,
- *   tramite l'override di $db_prefix.
+ * - Definire una scorciatoia per non dover digitare ogni volta tutto il
+ *   nome della sezione, tramite l'override di $db_prefix.
  * - Effettuare una validazione o sanitizzazione delle opzioni, tramite
  *   l'override di config()
  */
@@ -77,21 +77,19 @@ abstract class Config
      */
     public static function config( string $query, $default = null )
     {
-        $tokens = explode( '.', $query );
-
-        $option_name = $tokens[0];
-
-        if ( ! $option_name ) {
+        if ( ! $query ) {
             throw new \Exception( 'Passato valore vuoto o invalido a config', 1 );
         }
 
         $default = $default ?? static::getDefaultValue( $query );
 
-        $option_key = $option_name;
-
         if ( static::$db_prefix ) {
-            $option_key = static::$db_prefix . $option_key;
+            $query = static::$db_prefix . $query;
         }
+
+        $tokens = explode( '.', $query );
+
+        $option_key = $tokens[0];
 
         $option_value = get_option( $option_key, $default );
 
