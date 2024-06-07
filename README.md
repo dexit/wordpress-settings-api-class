@@ -1,38 +1,66 @@
+# Come funziona
+
+* Crea nuove pagine di opzioni in WordPress estendendo la classe `Idearia\SettingsPage`.
+* Se vuoi creare un menu o sottomenu in WordPress senza opzioni, basta che estendi la classe `Idearia\MenuPage`.
+* Accedi alle opzioni serializzate come fossi in Laravel estendend la classe `Idearia\Config`.
+
+# Features
+
+- Crea una pagina di opzioni usando solo array, niente codice richiesto.
+- Usa il pratico template a tabs per raggruppare le opzioni.
+- Controlla chi può vedere i menu.
+- Controlla chi può modificare le opzioni.
+- Controlla la posizione dei menu.
+- Crea sia menu che sotto-menu.
+
+# Dopo ogni modifica al repo...
+
+Aggiorna il repository composer di Idearia come da istruzioni:
+
+* https://trello.com/c/Q4wyOV9u/
+
+
+# Esempio pagina di menu semplice
+
+```php
 <?php
 
-/**
- * WordPress settings API demo class
- *
- * @author Tareq Hasan
- */
-if ( !class_exists('WeDevs_Settings_API_Test' ) ):
-class WeDevs_Settings_API_Test {
+use Idearia\MenuPage;
 
-    private $settings_api;
+class ExampleMenuPage extends MenuPage
+{
+    protected $label = 'Example Menu Page';
 
-    function __construct() {
-        $this->settings_api = new WeDevs_Settings_API;
+    protected $slug = 'example-menu-page';
 
-        add_action( 'admin_init', array($this, 'admin_init') );
-        add_action( 'admin_menu', array($this, 'admin_menu') );
+    protected $capability = 'edit_posts';
+
+    public function view()
+    {
+        echo '<h1>Hello world</h1>';
+        echo '<p>';
+        echo 'Questa pagina può essere vista solo dagli editor in su.';
+        echo '</p>';
     }
+}
+```
 
-    function admin_init() {
+# Esempio pagina dei settings completa
 
-        //set the settings
-        $this->settings_api->set_sections( $this->get_settings_sections() );
-        $this->settings_api->set_fields( $this->get_settings_fields() );
+```php
+<?php
 
-        //initialize settings
-        $this->settings_api->admin_init();
-    }
+use Idearia\SettingsPage;
 
-    function admin_menu() {
-        add_options_page( 'Settings API', 'Settings API', 'delete_posts', 'settings_api_test', array($this, 'plugin_page') );
-    }
+class ExampleSettingsPage extends SettingsPage
+{
+    protected $label = 'Example Settings Page';
 
-    function get_settings_sections() {
-        $sections = array(
+    protected $slug = 'example-settings-page';
+
+    protected function getSections()
+    {
+        return array(
             array(
                 'id'    => 'wedevs_basics',
                 'title' => __( 'Basic Settings', 'wedevs' )
@@ -42,16 +70,11 @@ class WeDevs_Settings_API_Test {
                 'title' => __( 'Advanced Settings', 'wedevs' )
             )
         );
-        return $sections;
     }
 
-    /**
-     * Returns all the settings fields
-     *
-     * @return array settings fields
-     */
-    function get_settings_fields() {
-        $settings_fields = array(
+    protected function getFields()
+    {
+        return array(
             'wedevs_basics' => array(
                 array(
                     'name'              => 'text_val',
@@ -168,35 +191,6 @@ class WeDevs_Settings_API_Test {
                 ),
             )
         );
-
-        return $settings_fields;
     }
-
-    function plugin_page() {
-        echo '<div class="wrap">';
-
-        $this->settings_api->show_navigation();
-        $this->settings_api->show_forms();
-
-        echo '</div>';
-    }
-
-    /**
-     * Get all the pages
-     *
-     * @return array page names with key value pairs
-     */
-    function get_pages() {
-        $pages = get_pages();
-        $pages_options = array();
-        if ( $pages ) {
-            foreach ($pages as $page) {
-                $pages_options[$page->ID] = $page->post_title;
-            }
-        }
-
-        return $pages_options;
-    }
-
 }
-endif;
+```

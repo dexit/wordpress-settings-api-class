@@ -1,22 +1,16 @@
 {
-    "name": "tareq1988/wordpress-settings-api-class",
-    "type": "library",
+    "name": "idearia/wordpress-settings-api-class",
     "description": "WordPress settings API Abstraction Class",
-    "keywords": ["wp","wordpress", "settings-api"],
-    "homepage": "https://github.com/tareq1988/wordpress-settings-api-class",
-    "license": "GPLv2",
-    "authors": [
-        {
-            "name": "Tareq Hasan",
-            "email": "tareq@wedevs.com",
-            "homepage": "http://tareq.wedevs.com",
-            "role": "Developer"
-        }
-    ],
+    "keywords": ["wp", "wordpress", "settings-api"],
+    "type": "library",
+    "license": "GPL-3.0-or-later",
+    "homepage": "https://github.com/Idearia/wordpress-settings-api-class",
     "require": {
-        "php": ">=5.2.4"
+        "php": "^7.0|^8.0"
     },
     "autoload": {
-        "classmap": ["src/"]
+        "psr-4": {
+            "Idearia\\": "src/"
+        }
     }
 }

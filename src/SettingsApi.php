@@ -1,17 +1,12 @@
 <?php
 
-/**
- * weDevs Settings API wrapper class
- *
- * @version 1.3 (27-Sep-2016)
- *
- * @author Tareq Hasan <tareq@weDevs.com>
- * @link https://tareq.co Tareq Hasan
- * @example example/oop-example.php How to use the class
- */
-if ( !class_exists( 'WeDevs_Settings_API' ) ):
-class WeDevs_Settings_API {
+namespace Idearia;
 
+/**
+ * Settings API wrapper class
+ */
+class SettingsApi
+{
     /**
      * settings sections array
      *
@@ -97,6 +92,8 @@ class WeDevs_Settings_API {
      * registers them to WordPress and ready for use.
      */
     function admin_init() {
+        if( ! is_array( $this->settings_sections ) )
+            return ;
         //register settings sections
         foreach ( $this->settings_sections as $section ) {
             if ( false == get_option( $section['id'] ) ) {
@@ -106,8 +103,8 @@ class WeDevs_Settings_API {
             if ( isset($section['desc']) && !empty($section['desc']) ) {
                 $section['desc'] = '<div class="inside">' . $section['desc'] . '</div>';
                 $callback = function() use ( $section ) {
-		    echo str_replace( '"', '\"', $section['desc'] );
-		};
+                    echo str_replace( '"', '\"', $section['desc'] );
+                };
             } else if ( isset( $section['callback'] ) ) {
                 $callback = $section['callback'];
             } else {
@@ -117,6 +114,8 @@ class WeDevs_Settings_API {
             add_settings_section( $section['id'], $section['title'], $callback, $section['id'] );
         }
 
+        if( ! is_array($this->settings_fields) )
+            return ;
         //register settings fields
         foreach ( $this->settings_fields as $section => $field ) {
             foreach ( $field as $option ) {
@@ -142,6 +141,7 @@ class WeDevs_Settings_API {
                     'min'               => isset( $option['min'] ) ? $option['min'] : '',
                     'max'               => isset( $option['max'] ) ? $option['max'] : '',
                     'step'              => isset( $option['step'] ) ? $option['step'] : '',
+                    'post_type'         => isset( $option['post_type'] ) ? $option['post_type'] : 'page',
                 );
 
                 add_settings_field( "{$section}[{$name}]", $label, $callback, $section, $section, $args );
@@ -417,12 +417,16 @@ class WeDevs_Settings_API {
     function callback_pages( $args ) {
 
         $dropdown_args = array(
-            'selected' => esc_attr($this->get_option($args['id'], $args['section'], $args['std'] ) ),
-            'name'     => $args['section'] . '[' . $args['id'] . ']',
-            'id'       => $args['section'] . '[' . $args['id'] . ']',
-            'echo'     => 0
+            'selected'  => esc_attr($this->get_option($args['id'], $args['section'], $args['std'] ) ),
+            'name'      => $args['section'] . '[' . $args['id'] . ']',
+            'id'        => $args['section'] . '[' . $args['id'] . ']',
+            'echo'      => 0,
+            'post_type' => $args['post_type'],
+            'hierarchical' => true,
+            'show_option_none' => '— Select —',
         );
         $html = wp_dropdown_pages( $dropdown_args );
+        $html .= $this->get_field_description( $args );
         echo $html;
     }
 
@@ -504,6 +508,9 @@ class WeDevs_Settings_API {
     function show_navigation() {
         $html = '<h2 class="nav-tab-wrapper">';
 
+        if( ! is_array( $this->settings_sections ) )
+            return ;
+
         $count = count( $this->settings_sections );
 
         // don't show the navigation if only one section exists
@@ -526,6 +533,8 @@ class WeDevs_Settings_API {
      * This function displays every sections in a different form
      */
     function show_forms() {
+        if( ! is_array( $this->settings_sections ) )
+            return ;
         ?>
         <div class="metabox-holder">
             <?php foreach ( $this->settings_sections as $form ) { ?>
@@ -654,5 +663,3 @@ class WeDevs_Settings_API {
     }
 
 }
-
-endif;
